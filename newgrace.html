@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice UI Project - Secure Client Portal</title>
+    <style>
+        :root {
+            --primary-color: #0a2540;
+            --secondary-color: #635bff;
+            --savings-color: #00d4b2;
+            --checking-color: #24b47e;
+            --p2p-color: #ff9800;
+            --text-color: #333333;
+            --background-color: #f6f9fc;
+            --danger-color: #df1b41;
+            --card-bg: #ffffff;
+            --text-muted: #6b7c93;
+            --border-color: #e6ebf1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 540px;
+            margin: 0 auto;
+        }
+
+        /* --- Header & Logo Styling --- */
+        .page-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo-container {
+            width: 130px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        .page-header .bank-name-banner {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+
+        .page-header h1 {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* --- UI Card Styling --- */
+        .card {
+            background-color: var(--card-bg);
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(50, 50, 93, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--border-color);
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 22px 18px;
+            }
+            .page-header .bank-name-banner {
+                font-size: 1.35rem;
+            }
+        }
+
+        .card-header h2 {
+            margin-top: 0;
+            margin-bottom: 24px;
+            text-align: center;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Form Layouts */
+        .form-group { 
+            margin-bottom: 18px; 
+            position: relative; 
+        }
+        
+        .form-row { 
+            display: flex; 
+            gap: 15px; 
+            margin-bottom: 18px; 
+        }
+        
+        .form-row .form-group { 
+            flex: 1; 
+            margin-bottom: 0; 
+        }
+        
+        .form-group label { 
+            display: block; 
+            margin-bottom: 6px; 
+            font-weight: 500; 
+            font-size: 14px; 
+        }
+        
+        .form-group input, .form-group select { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 6px; 
+            box-sizing: border-box; 
+            font-size: 16px;
+            background-color: #fff;
+            color: var(--text-color);
+            -webkit-appearance: none;
+        }
+        
+        /* Password Helper Row */
+        .password-helper-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 6px;
+        }
+        
+        .password-toggle-link {
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--secondary-color);
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .password-toggle-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Interactive dynamic tags */
+        .bank-detector-tag {
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--secondary-color);
+            position: absolute;
+            right: 12px;
+            top: 38px;
+            background: #f1f4f9;
+            padding: 4px 8px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .btn {
+            width: 100%; 
+            padding: 12px; 
+            background-color: var(--secondary-color);
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            font-size: 16px; 
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+            font-weight: 600;
+        }
+        .btn:hover { background-color: #4b45d0; }
+        .btn:disabled { background-color: #a3acb9; cursor: not-allowed; }
+
+        /* Links to switch forms */
+        .form-toggle-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        .form-toggle-text a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .form-toggle-text a:hover { text-decoration: underline; }
+
+        /* Dashboard View Layout */
+        .dashboard h2 { color: var(--primary-color); margin-bottom: 20px; }
+        .dashboard p { font-weight: 600; color: var(--primary-color); margin-bottom: 12px; font-size: 0.95rem; }
+        
+        /* Account info boxes */
+        .account-box {
+            background-color: #f8fafc;
+            padding: 18px;
+            border-radius: 8px;
+            margin: 14px 0;
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+        .savings { border-left: 4px solid var(--savings-color); }
+        .checking { border-left: 4px solid var(--checking-color); }
+        
+        .account-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+        .balance-amount { font-size: 24px; font-weight: bold; color: var(--primary-color); margin-top: 4px; word-break: break-all; }
+        .account-number-subtext { font-size: 12px; color: #a3acb9; margin-top: 4px; font-family: monospace; }
+        
+        /* Credentials Summary Grid Box */
+        .credentials-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            background-color: #f1f4f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+        }
+        .credential-item { font-size: 13px; color: #4f5b66; }
+        .credential-item strong { display: block; color: var(--primary-color); font-family: monospace; font-size: 14px; margin-top: 4px;}
+
+        /* Dashboard Tabs Layout */
+        .tab-navigation {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-top: 25px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+        }
+        .tab-button.active {
+            color: var(--secondary-color);
+            border-bottom-color: var(--secondary-color);
+        }
+
+        .module-pane h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            font-size: 18px;
+        }
+
+        /* --- Transaction History Layout Styles --- */
+        .history-section {
+            margin-top: 30px;
+            border-top: 2px dashed var(--border-color);
+            padding-top: 20px;
+        }
+        .history-section h3 {
+            color: var(--primary-color);
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+            background-color: #fff;
+        }
+        .history-table th {
+            background-color: #f8fafc;
+            color: var(--text-muted);
+            padding: 10px 12px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .history-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f1f4f9;
+            color: #4f5b66;
+        }
+        .history-table tr:last-child td {
+            border-bottom: none;
+        }
+        .txt-negative {
+            color: var(--danger-color);
+            font-weight: 600;
+        }
+        .txt-positive {
+            color: var(--checking-color);
+            font-weight: 600;
+        }
+        .empty-history-text {
+            text-align: center;
+            color: #a3acb9;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        /* Alert Banners */
+        .alert-message { font-size: 14px; margin-bottom: 15px; text-align: center; font-weight: 500; padding: 10px; border-radius: 6px; border: 1px solid transparent; }
+        .error-banner { color: #df1b41; background-color: #fbeae0; border-color: #f3d4c3; }
+        .success-banner { color: #24b47e; background-color: #eafaf1; border-color: #d1f2e1; }
+        .info-banner { color: #0a2540; background-color: #e6ebf1; border-color: #d3dbe5; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <header class="page-header">
+        <div class="logo-container">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 240" width="100%" height="100%">
+                <path d="M75,30 L135,65 L135,145 C135,190 75,225 75,225 C75,225 15,190 15,145 L15,65 Z" fill="none" stroke="#0a2540" stroke-width="8" stroke-linejoin="round"/>
+                <path d="M75,32 L75,220 M40,80 L40,155 M110,80 L110,155" fill="none" stroke="#0a2540" stroke-width="4" stroke-opacity="0.15"/>
+                <path d="M75,15 L82,40 L105,40 L86,54 L93,78 L75,62 L57,78 L64,54 L45,40 L68,40 Z" fill="#635bff"/>
+                <text x="32" y="125" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="900" fill="#0a2540">F</text>
+                <text x="54" y="150" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="900" fill="#0a2540">B</text>
+                <text x="92" y="125" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="900" fill="#0a2540">C</text>
+                <text x="160" y="115" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="900" fill="#0a2540" letter-spacing="-2">FBSC</text>
+                <text x="162" y="142" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="bold" fill="#0a2540" letter-spacing="0.5">FINANCIAL BANKING</text>
+                <text x="162" y="158" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="bold" fill="#0a2540" letter-spacing="0.5">SERVICES CORPORATION</text>
+                <line x1="162" y1="178" x2="295" y2="178" stroke="#635bff" stroke-width="3"/>
+                <text x="162" y="198" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#6b7c93" letter-spacing="1">YOUR PARTNER IN PROGRESS</text>
+            </svg>
+        </div>
+        <div class="bank-name-banner">Financial Banking Services Corporation (FBSC)</div>
+        <h1>Secure Client Portal</h1>
+    </header>
+
+    <div id="loginView" class="card">
+        <div class="card-header">
+            <h2>Account Login</h2>
+        </div>
+        <div id="loginError" class="alert-message error-banner hidden">Invalid username or password.</div>
+        <div id="signUpSuccess" class="alert-message success-banner hidden"></div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginUid">Username</label>
+                <input type="text" id="loginUid" required autocomplete="off" placeholder="Enter your username">
+            </div>
+            <div class="form-group">
+                <label for="loginPwd">Password</label>
+                <input type="password" id="loginPwd" required autocomplete="off" placeholder="Enter your password">
+            </div>
+            <button type="submit" class="btn">Verify Credentials</button>
+        </form>
+        <div class="form-toggle-text">
+            Don't have an account? <a href="#" id="linkToSignUp">Sign Up Here</a>
+        </div>
+    </div>
+
+    <div id="signUpView" class="card hidden">
+        <div class="card-header">
+            <h2>Create Account</h2>
+        </div>
+        <div id="signUpError" class="alert-message error-banner hidden">Username already exists.</div>
+        <div id="signUpStatus" class="alert-message info-banner hidden">Processing registration...</div>
+        
+        <form id="registrationForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="regFirstName">First Name</label>
+                    <input type="text" id="regFirstName" required autocomplete="given-name" placeholder="John">
+                </div>
+                <div class="form-group">
+                    <label for="regLastName">Last Name</label>
+                    <input type="text" id="regLastName" required autocomplete="family-name" placeholder="Doe">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="regVerifyDate">Verification Date</label>
+                    <input type="date" id="regVerifyDate" required max="2010-12-31">
+                </div>
+                <div class="form-group">
+                    <label for="regContactToken">Contact Token</label>
+                    <input type="text" id="regContactToken" required pattern="\d{3}-\d{3}-\d{4}" placeholder="000-000-0000">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="regEmail">Email Address</label>
+                <input type="email" id="regEmail" required autocomplete="email" placeholder="name@example.com">
+            </div>
+            <div class="form-group">
+                <label for="regUid">Choose Username</label>
+                <input type="text" id="regUid" required autocomplete="username" placeholder="Create a unique username">
+            </div>
+            <div class="form-group">
+                <label for="regPwd">Create Password</label>
+                <input type="password" id="regPwd" required autocomplete="new-password" placeholder="Create a strong password">
+                <div class="password-helper-row">
+                    <button type="button" id="togglePasswordLink" class="password-toggle-link">Show Password</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="regSecurityCode">Security Activation Code</label>
+                <input type="text" id="regSecurityCode" required placeholder="Enter 6-digit registration key">
+            </div>
+
+            <button type="submit" id="regSubmitBtn" class="btn" style="background-color: var(--checking-color);">Open Account</button>
+        </form>
+        <div class="form-toggle-text">
+            Already registered? <a href="#" id="linkToLogin">Back to Login</a>
+        </div>
+    </div>
+
+    <div id="dashboardView" class="card dashboard hidden">
+        <h2>Welcome Back, <span id="userGreeting"></span></h2>
+
+        <div class="credentials-grid">
+            <div class="credential-item">
+                Bank Routing Number
+                <strong id="routingDisplay">--------</strong>
+            </div>
+            <div class="credential-item">
+                Main ACH Account ID
+                <strong id="accountDisplay">--------</strong>
+            </div>
+        </div>
+
+        <p>Your Balances:</p>
+        
+        <div class="account-box savings">
+            <div class="account-label">Savings Account</div>
+            <div class="balance-amount" id="savingsDisplay">$0.00</div>
+            <div class="account-number-subtext" id="savingsAccDisplay">Account: --</div>
+        </div>
+
+        <div class="account-box checking">
+            <div class="account-label">Checking Account</div>
+            <div class="balance-amount" id="checkingDisplay">$0.00</div>
+            <div class="account-number-subtext" id="checkingAccDisplay">Account: --</div>
+        </div>
+
+        <nav class="tab-navigation">
+            <button class="tab-button active" id="tabInternalBtn">Internal Transfer</button>
+            <button class="tab-button" id="tabP2PBtn">Send to User</button>
+            <button class="tab-button" id="tabExternalBtn">External Wire</button>
+        </nav>
+        
+        <div id="transferAlert" class="alert-message hidden"></div>
+
+        <div id="internalTransferPane" class="module-pane">
+            <h3>Internal Funds Transfer</h3>
+            <form id="internalTransferForm">
+                <div class="form-group">
+                    <label for="transferFrom">From Account</label>
+                    <select id="transferFrom" required>
+                        <option value="savings">Savings Account</option>
+                        <option value="checking">Checking Account</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="transferTo">To Account</label>
+                    <select id="transferTo" required>
+                        <option value="checking">Checking Account</option>
+                        <option value="savings">Savings Account</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="transferAmount">Amount ($)</label>
+                    <input type="number" id="transferAmount" min="0.01" step="0.01" required placeholder="0.00">
+                </div>
+                <button type="submit" class="btn" style="background-color: var(--primary-color);">Execute Internal Transfer</button>
+            </form>
+        </div>
+
+        <div id="p2pTransferPane" class="module-pane hidden">
+            <h3>Send Money to FBSC Member</h3>
+            <form id="p2pTransferForm">
+                <div class="form-group">
+                    <label for="p2pSource">From Your Account</label>
+                    <select id="p2pSource" required>
+                        <option value="checking">Checking Account</option>
+                        <option value="savings">Savings Account</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="p2pTarget">Recipient Username or Account ID</label>
+                    <input type="text" id="p2pTarget" required placeholder="Enter username or 9-digit ID">
+                </div>
+                <div class="form-group">
+                    <label for="p2pAmount">Amount ($)</label>
+                    <input type="number" id="p2pAmount" min="0.01" step="0.01" required placeholder="0.00">
+                </div>
+                <button type="submit" class="btn" style="background-color: var(--p2p-color);">Transfer to Member</button>
+            </form>
+        </div>
+
+        <div id="externalTransferPane" class="module-pane hidden">
+            <h3>External Wire Routing (ACH Network)</h3>
+            <form id="externalTransferForm">
+                <div class="form-group">
+                    <label for="extSource">Funding Source</label>
+                    <select id="extSource" required>
+                        <option value="checking">Checking Account</option>
+                        <option value="savings">Savings Account</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="extRouting">Routing Transit Number (9 digits)</label>
+                    <input type="text" id="extRouting" maxlength="9" pattern="\d{9}" required placeholder="Try 021000021 or 121000248">
+                    <span id="bankDetector" class="bank-detector-tag hidden">Unknown Bank</span>
+                </div>
+                <div class="form-group">
+                    <label for="extAccount">Recipient Account Number</label>
+                    <input type="text" id="extAccount" pattern="\d{4,17}" required placeholder="Recipient Account ID">
+                </div>
+                <div class="form-group">
+                    <label for="extAmount">Wire Amount ($)</label>
+                    <input type="number" id="extAmount" min="0.01" step="0.01" required placeholder="0.00">
+                </div>
+                <button type="submit" class="btn" style="background-color: var(--secondary-color);">Authorize Interbank Wire</button>
+            </form>
+        </div>
+
+        <div class="history-section">
+            <h3>Recent Transaction Activity</h3>
+            <div class="table-container">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <button id="logoutBtn" class="btn" style="background-color: #6b7c93; margin-top: 25px;">Exit Session</button>
+    </div>
+
+</div>
+
+<script>
+    const DEFAULT_SECURITY_CODE = "620680";
+
+    const defaultUsers = [
+        {
+            user: "juntob123",
+            firstName: "Tobi",
+            lastName: "Fabiyi",
+            email: "support@fbsconline.com",
+            pass: "Ayindeade07$",
+            routing: "100825441",
+            accountBase: "440912538",
+            savings: 900000000000000.00,        
+            checking: 900000000000000.00,      
+            transactions: [
+                { timestamp: "2026-06-01 09:14", text: "Opening Network Credit Deposit", type: "positive", amount: 20100000000000.00 }
+            ]
+        },
+        {
+            user: "Evelyn01",
+            firstName: "Evan K",
+            lastName: "Dalton",
+            email: "evelyn@fbsconline.com",
+            pass: "Shepard2$",
+            routing: "100825441",
+            accountBase: "518349207",
+            savings: 1000000.00,
+            checking: 1500000.00,
+            transactions: [
+                { timestamp: "2026-06-05 14:22", text: "Initial Secure Savings Allocation", type: "positive", amount: 1000000.00 },
+                { timestamp: "2026-06-05 14:22", text: "Initial Secure Checking Allocation", type: "positive", amount: 1500000.00 }
+            ]
+        },
+        {
+            user: "jeffery123",
+            firstName: "Jeffery",
+            lastName: "Adams",
+            email: "jeffery@example.com",
+            pass: "Computer07$",
+            routing: "100825441",
+            accountBase: "294810374",
+            savings: 50000.00,
+            checking: 25000.00,
+            transactions: [
+                { timestamp: "2026-06-09 11:05", text: "Standard Account Setup Deposit", type: "positive", amount: 75000.00 }
+            ]
+        },
+        {
+            user: "alex99",
+            firstName: "Alex",
+            lastName: "Smith",
+            email: "alex@example.com",
+            pass: "AlexPass123!",
+            routing: "100825441",
+            accountBase: "123456789",
+            savings: 5000.00,
+            checking: 2500.00,
+            transactions: []
+        }
+    ];
+
+    let userDatabase = JSON.parse(localStorage.getItem('fbsc_user_db'));
+    if (!userDatabase || userDatabase.length === 0) {
+        userDatabase = defaultUsers;
+        localStorage.setItem('fbsc_user_db', JSON.stringify(userDatabase));
+    }
+
+    function saveDatabaseState() {
+        localStorage.setItem('fbsc_user_db', JSON.stringify(userDatabase));
+    }
+
+    const centralRoutingRegistry = {
+        "021000021": "JPMorgan Chase Bank",
+        "121000248": "Wells Fargo Bank",
+        "026009593": "Bank of America",
+        "021100203": "Citibank",
+        "031000053": "PNC Bank",
+        "100825441": "Financial Banking Services Corporation Internal Network"
+    };
+
+    let activeUserSession = null;
+
+    const loginView = document.getElementById('loginView');
+    const signUpView = document.getElementById('signUpView');
+    const dashboardView = document.getElementById('dashboardView');
+
+    const loginForm = document.getElementById('loginForm');
+    const registrationForm = document.getElementById('registrationForm');
+    const internalTransferForm = document.getElementById('internalTransferForm');
+    const p2pTransferForm = document.getElementById('p2pTransferForm');
+    const externalTransferForm = document.getElementById('externalTransferForm');
+    
+    const regSubmitBtn = document.getElementById('regSubmitBtn');
+    const signUpStatus = document.getElementById('signUpStatus');
+    const signUpError = document.getElementById('signUpError');
+    const transferAlert = document.getElementById('transferAlert');
+    const historyTableBody = document.getElementById('historyTableBody');
+
+    const internalPane = document.getElementById('internalTransferPane');
+    const p2pPane = document.getElementById('p2pTransferPane');
+    const externalPane = document.getElementById('externalTransferPane');
+    
+    const tabInternalBtn = document.getElementById('tabInternalBtn');
+    const tabP2PBtn = document.getElementById('tabP2PBtn');
+    const tabExternalBtn = document.getElementById('tabExternalBtn');
+    
+    const extRoutingInput = document.getElementById('extRouting');
+    const bankDetector = document.getElementById('bankDetector');
+
+    const regPwdInput = document.getElementById('regPwd');
+    const togglePasswordLink = document.getElementById('togglePasswordLink');
+
+    function formatCurrency(value) {
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+    }
+
+    function getFormattedTimestamp() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${minutes}`;
+    }
+
+    function renderTransactionHistory() {
+        historyTableBody.innerHTML = "";
+        
+        if (!activeUserSession.transactions || activeUserSession.transactions.length === 0) {
+            historyTableBody.innerHTML = `<tr><td colspan="3" class="empty-history-text">No transaction actions tracked in this profile.</td></tr>`;
+            return;
+        }
+
+        for (let i = activeUserSession.transactions.length - 1; i >= 0; i--) {
+            const tx = activeUserSession.transactions[i];
+            const row = document.createElement('tr');
+            
+            let amtClass = 'txt-positive';
+            let prefix = '+';
+            if (tx.type === 'negative') {
+                amtClass = 'txt-negative';
+                prefix = '-';
+            } else if (tx.type === 'neutral') {
+                amtClass = '';
+                prefix = '';
+            }
+
+            row.innerHTML = `
+                <td>${tx.timestamp}</td>
+                <td>${tx.text}</td>
+                <td class="${amtClass}">${prefix}${formatCurrency(tx.amount)}</td>
+            `;
+            historyTableBody.appendChild(row);
+        }
+    }
+
+    function syncDashboardBalances() {
+        if (!activeUserSession) return;
+        document.getElementById('savingsDisplay').textContent = formatCurrency(activeUserSession.savings);
+        document.getElementById('checkingDisplay').textContent = formatCurrency(activeUserSession.checking);
+        
+        document.getElementById('routingDisplay').textContent = activeUserSession.routing;
+        document.getElementById('accountDisplay').textContent = activeUserSession.accountBase;
+        
+        document.getElementById('savingsAccDisplay').textContent = `Account: ${activeUserSession.accountBase}-S`;
+        document.getElementById('checkingAccDisplay').textContent = `Account: ${activeUserSession.accountBase}-C`;
+
+        renderTransactionHistory();
+    }
+
+    function switchTab(activeBtn, visiblePane) {
+        [tabInternalBtn, tabP2PBtn, tabExternalBtn].forEach(btn => btn.classList.remove('active'));
+        [internalPane, p2pPane, externalPane].forEach(pane => pane.classList.add('hidden'));
+        
+        activeBtn.classList.add('active');
+        visiblePane.classList.remove('hidden');
+        transferAlert.classList.add('hidden');
+    }
+
+    tabInternalBtn.addEventListener('click', () => switchTab(tabInternalBtn, internalPane));
+    tabP2PBtn.addEventListener('click', () => switchTab(tabP2PBtn, p2pPane));
+    tabExternalBtn.addEventListener('click', () => switchTab(tabExternalBtn, externalPane));
+
+    extRoutingInput.addEventListener('input', function() {
+        const val = this.value.trim();
+        if (val.length === 9) {
+            const detectedBank = centralRoutingRegistry[val] || "Recognized External Institution";
+            bankDetector.textContent = detectedBank;
+            bankDetector.classList.remove('hidden');
+        } else {
+            bankDetector.classList.add('hidden');
+        }
+    });
+
+    togglePasswordLink.addEventListener('click', function() {
+        if (regPwdInput.type === 'password') {
+            regPwdInput.type = 'text';
+            togglePasswordLink.textContent = 'Hide Password';
+        } else {
+            regPwdInput.type = 'password';
+            togglePasswordLink.textContent = 'Show Password';
+        }
+    });
+
+    document.getElementById('linkToSignUp').addEventListener('click', function(e) {
+        e.preventDefault();
+        loginView.classList.add('hidden');
+        signUpView.classList.remove('hidden');
+        signUpError.classList.add('hidden');
+        signUpStatus.classList.add('hidden');
+        
+        regPwdInput.type = 'password';
+        togglePasswordLink.textContent = 'Show Password';
+    });
+
+    document.getElementById('linkToLogin').addEventListener('click', function(e) {
+        e.preventDefault();
+        signUpView.classList.add('hidden');
+        loginView.classList.remove('hidden');
+        document.getElementById('signUpSuccess').classList.add('hidden');
+        document.getElementById('loginError').classList.add('hidden');
+    });
+
+    registrationForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const first = document.getElementById('regFirstName').value.trim();
+        const last = document.getElementById('regLastName').value.trim();
+        const desiredEmail = document.getElementById('regEmail').value.trim();
+        const desiredUser = document.getElementById('regUid').value.trim();
+        const desiredPass = regPwdInput.value;
+        const securityCodeInput = document.getElementById('regSecurityCode').value.trim();
+
+        if (securityCodeInput !== DEFAULT_SECURITY_CODE) {
+            signUpError.textContent = "Registration Denied: Invalid Security Activation Code.";
+            signUpError.classList.remove('hidden');
+            signUpStatus.classList.add('hidden');
+            return;
+        }
+
+        const userExists = userDatabase.some(record => record.user.toLowerCase() === desiredUser.toLowerCase());
+        if (userExists) {
+            signUpError.textContent = "Username already exists.";
+            signUpError.classList.remove('hidden');
+            signUpStatus.classList.add('hidden');
+            return;
+        }
+
+        signUpError.classList.add('hidden');
+        signUpStatus.textContent = `Authenticating activation code...`;
+        signUpStatus.classList.remove('hidden');
+        regSubmitBtn.disabled = true;
+
+        setTimeout(() => {
+            signUpStatus.textContent = `Generating unique routing identifiers...`;
+            setTimeout(() => {
+                const randomAccountNum = Math.floor(100000000 + Math.random() * 900000000).toString();
+                
+                userDatabase.push({
+                    user: desiredUser,
+                    firstName: first,
+                    lastName: last,
+                    email: desiredEmail,
+                    pass: desiredPass,
+                    routing: "100825441", 
+                    accountBase: randomAccountNum,
+                    savings: 0.00,
+                    checking: 0.00,
+                    transactions: []
+                });
+
+                saveDatabaseState();
+
+                registrationForm.reset();
+                regPwdInput.type = 'password';
+                togglePasswordLink.textContent = 'Show Password';
+                
+                regSubmitBtn.disabled = false;
+                signUpView.classList.add('hidden');
+                loginView.classList.remove('hidden');
+                
+                document.getElementById('loginError').classList.add('hidden');
+                const successBanner = document.getElementById('signUpSuccess');
+                successBanner.innerHTML = `<strong>Registration Complete!</strong><br>Your secure profile has been configured successfully.`;
+                successBanner.classList.remove('hidden');
+            }, 1500); 
+        }, 1000); 
+    });
+
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const userInput = document.getElementById('loginUid').value.trim();
+        const passInput = document.getElementById('loginPwd').value;
+        const loginError = document.getElementById('loginError');
+
+        const authenticatedUser = userDatabase.find(record => record.user === userInput && record.pass === passInput);
+
+        if (authenticatedUser) {
+            activeUserSession = authenticatedUser;
+            document.getElementById('userGreeting').textContent = activeUserSession.firstName || activeUserSession.user;
+            syncDashboardBalances();
+            
+            loginView.classList.add('hidden');
+            loginError.classList.add('hidden');
+            document.getElementById('signUpSuccess').classList.add('hidden');
+            dashboardView.classList.remove('hidden');
+            transferAlert.classList.add('hidden');
+            internalTransferForm.reset();
+            p2pTransferForm.reset();
+            externalTransferForm.reset();
+            bankDetector.classList.add('hidden');
+        } else {
+            document.getElementById('signUpSuccess').classList.add('hidden');
+            loginError.classList.remove('hidden');
+        }
+    });
+
+    internalTransferForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const source = document.getElementById('transferFrom').value;
+        const destination = document.getElementById('transferTo').value;
+        const amount = parseFloat(document.getElementById('transferAmount').value);
+
+        transferAlert.className = "alert-message"; 
+        
+        if (source === destination) {
+            transferAlert.classList.add('error-banner');
+            transferAlert.textContent = "Error: Destination must be a different account.";
+            transferAlert.classList.remove('hidden');
+            return;
+        }
+
+        if (activeUserSession[source] < amount) {
+            transferAlert.classList.add('error-banner');
+            transferAlert.textContent = `Insufficient funds available in your ${source} allocation.`;
+            transferAlert.classList.remove('hidden');
+            return;
+        }
+
+        activeUserSession[source] -= amount;
+        activeUserSession[destination] += amount;
+
+        activeUserSession.transactions.push({
+            timestamp: getFormattedTimestamp(),
+            text: `Internal Box Transfer: ${source} allocation to ${destination} allocation`,
+            type: "neutral",
+            amount: amount
+        });
+
+        saveDatabaseState();
+        syncDashboardBalances();
+        internalTransferForm.reset();
+
+        transferAlert.classList.add('success-banner');
+        transferAlert.textContent = "Success! Internal balancing allocation executed cleanly.";
+        transferAlert.classList.remove('hidden');
+    });
+
+    p2pTransferForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const source = document.getElementById('p2pSource').value;
+        const targetInput = document.getElementById('p2pTarget').value.trim();
+        const amount = parseFloat(document.getElementById('p2pAmount').value);
+
+        transferAlert.className = "alert-message";
+
+        if (activeUserSession[source] < amount) {
+            transferAlert.classList.add('error-banner');
+            transferAlert.textContent = "Transaction Denied: Insufficient vault allocation balance.";
+            transferAlert.classList.remove('hidden');
+            return;
+        }
+
+        const recipient = userDatabase.find(record => 
+            record.user.toLowerCase() === targetInput.toLowerCase() || 
+            record.accountBase === targetInput
+        );
+
+        if (!recipient) {
+            transferAlert.classList.add('error-banner');
+            transferAlert.textContent = "Routing Failed: Recipient identifier could not be verified in registry.";
+            transferAlert.classList.remove('hidden');
+            return;
+        }
+
+        if (recipient.user === activeUserSession.user) {
+            transferAlert.classList.add('error-banner');
+            transferAlert.textContent = "Error: Cannot execute cross-network transfer to self identifier.";
+            transferAlert.classList.remove('hidden');
+            return;
+        }
+
+        activeUserSession[source] -= amount;
+        recipient.checking += amount; 
+
+        const txTimestamp = getFormattedTimestamp();
+        
+        activeUserSession.transactions.push({
+            timestamp: txTimestamp,
+            text: `P2P Outer Transfer Out to Member ID: ${recipient.user}`,
+            type: "negative",
+            amount: amount
+        });
+
+        recipient.transactions.push({
+            timestamp: txTimestamp,
+            text: `P2P Network Credit Received from ID: ${activeUserSession.user}`,
+            type: "positive",
+            amount: amount
+        });
+
+        saveDatabaseState();
+        syncDashboardBalances();
+        p2pTransferForm.reset();
+
+        transferAlert.classList.add('success-banner');
+        transferAlert.textContent = `Authorization Complete! Funds routed to ledger destination ${recipient.firstName}.`;
+        transferAlert.classList.remove('hidden');
+    });
+
+    externalTransferForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const source = document.getElementById('extSource').value;
+        const routing = document.getElementById('extRouting').value.trim();
+        const account = document.getElementById('extAccount').value.trim();
+        const amount = parseFloat(document.getElementById('extAmount').value);
+
+        transferAlert.className = "alert-message";
+
+        if (activeUserSession[source] < amount) {
+            transferAlert.classList.add('error-banner');
+            transferAlert.textContent = "Wire Denied: Allocation capacity limit error.";
+            transferAlert.classList.remove('hidden');
+            return;
+        }
+
+        activeUserSession[source] -= amount;
+
+        const targetBank = centralRoutingRegistry[routing] || "External Routing Network Institution";
+
+        activeUserSession.transactions.push({
+            timestamp: getFormattedTimestamp(),
+            text: `ACH Wire Dispatched Out [Bank: ${targetBank} / Acc: ...${account.slice(-4)}]`,
+            type: "negative",
+            amount: amount
+        });
+
+        saveDatabaseState();
+        syncDashboardBalances();
+        externalTransferForm.reset();
+        bankDetector.classList.add('hidden');
+
+        transferAlert.classList.add('success-banner');
+        transferAlert.innerHTML = `<strong>ACH Wire Initialized!</strong><br>Interbank clearing queue authorized to ${targetBank}.`;
+        transferAlert.classList.remove('hidden');
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        activeUserSession = null;
+        dashboardView.classList.add('hidden');
+        loginView.classList.remove('hidden');
+        loginForm.reset();
+    });
+</script>
+
+</body>
+</html>
